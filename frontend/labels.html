@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>الملصقات - بوليصتي</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+<div id="sidebar-placeholder"></div>
+  <main class="main-content">
+    <div id="topbar-placeholder"></div>
+    <div class="card">
+      <input id="search" placeholder="بحث برقم الطلب أو الجوال أو اسم العميل" onkeyup="filterLabels()">
+      <table>
+        <thead>
+        <tr>
+          <th>رقم الطلب</th>
+          <th>العميل</th>
+          <th>الجوال</th>
+          <th>الدفع</th>
+          <th>الحالة</th>
+          <th>التاريخ</th>
+          <th>PDF</th>
+          <th>حذف</th>
+        </tr>
+        </thead>
+        <tbody id="labelsTable"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/labels.js"></script>
+<script src="js/layout.js"></script>
+</body>
+</html>

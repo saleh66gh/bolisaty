@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+
+bolisaty.db
+
+Labels/
+Logs/
+
+Assets/qr/
+Assets/text/
+.env
+.idea/
+
+.vscode/
+
+*.sqlite3

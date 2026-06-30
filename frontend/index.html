@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>بوليصتي - الرئيسية</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+    <div id="sidebar-placeholder"></div>
+
+    <main class="main-content">
+        <div id="topbar-placeholder"></div>
+        <div class="stats">
+            <div class="card stat"><h3>إجمالي الملصقات</h3><strong id="totalLabels">0</strong></div>
+            <div class="card stat"><h3>ملصقات اليوم</h3><strong id="todayLabels">0</strong></div>
+            <div class="card stat"><h3>إجمالي المرسلين</h3><strong id="totalSenders">0</strong></div>
+            <div class="card stat"><h3>ملصقات فاشلة</h3><strong id="failedLabels">0</strong></div>
+        </div>
+
+        <div class="card">
+            <h2>آخر 5 ملصقات</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>رقم الطلب</th>
+                    <th>العميل</th>
+                    <th>الجوال</th>
+                    <th>الحالة</th>
+                </tr>
+                </thead>
+                <tbody id="latestLabels"></tbody>
+            </table>
+        </div>
+
+        <a class="btn" href="create-label.html">إنشاء ملصق جديد</a>
+    </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/layout.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إنشاء ملصق - بوليصتي</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+  <div id="sidebar-placeholder"></div>
+
+  <main class="main-content">
+    <div id="topbar-placeholder"></div>
+
+    <section class="page-body">
+      <div class="card">
+        <h2>بيانات الطلب</h2>
+        <div class="grid-2">
+          <select id="sender_id" onchange="senderChanged()"></select>
+          <select id="template_id"></select>
+          <input id="order_number" placeholder="رقم الطلب">
+          <input id="order_date" type="date">
+        </div>
+
+        <h2>بيانات العميل</h2>
+        <div class="grid-2">
+          <input id="receiver_first_name" placeholder="الاسم الأول">
+          <input id="receiver_last_name" placeholder="الاسم الثاني">
+          <input id="receiver_country" placeholder="الدولة" value="السعودية">
+          <input id="receiver_phone" placeholder="رقم الجوال">
+          <input id="receiver_city" placeholder="المدينة">
+          <input id="receiver_district" placeholder="الحي">
+          <input id="receiver_national_address" placeholder="العنوان المختصر RQYB2924">
+        </div>
+
+        <textarea id="receiver_address" placeholder="العنوان التفصيلي"></textarea>
+
+        <h2>الشحنة والدفع</h2>
+        <div class="grid-2">
+          <input id="shipment_count" type="number" value="1" placeholder="عدد الشحنات">
+          <input id="weight" type="number" step="0.1" value="1" placeholder="الوزن">
+          <select id="cod_enabled">
+            <option value="false">مدفوع</option>
+            <option value="true">دفع عند الاستلام</option>
+          </select>
+          <input id="cod_amount" type="number" value="0" placeholder="مبلغ COD">
+        </div>
+
+        <h2>المنتجات</h2>
+        <div id="productsArea">
+          <div class="grid-2 product-row">
+            <input class="product-name" placeholder="اسم المنتج">
+            <input class="product-qty" type="number" value="1" placeholder="العدد">
+          </div>
+        </div>
+
+        <button class="btn-light" onclick="addProduct()">+ إضافة منتج</button>
+
+        <h2>ملاحظات</h2>
+        <textarea id="notes" placeholder="ملاحظات اختيارية"></textarea>
+
+        <button class="btn" onclick="createLabel()">إنشاء الملصق</button>
+
+        <div id="result" class="card" style="display:none;margin-top:20px"></div>
+      </div>
+    </section>
+  </main>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/create-label.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>المتاجر - بوليصتي</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+  <div id="sidebar-placeholder"></div>
+
+  <main class="main-content">
+    <div id="topbar-placeholder"></div>
+
+    <section class="page-body">
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h2>قائمة المتاجر</h2>
+          <button class="btn" onclick="openStoreWizard()">+ متجر جديد</button>
+        </div>
+
+        <input id="storeSearch" placeholder="بحث باسم المتجر أو رقم الحساب" style="max-width:360px;margin-bottom:16px">
+
+        <table>
+          <thead>
+  <tr>
+  <th>رقم الحساب</th>
+  <th>الشعار</th>
+  <th>المتجر</th>
+  <th>المالك</th>
+  <th>الجوال</th>
+  <th>الخطة</th>
+  <th>الاشتراك</th>
+  <th>الملصقات</th>
+  <th>الحالة</th>
+  <th>إجراءات</th>
+</tr>
+          <tbody id="storesTable"></tbody>
+        </table>
+      </div>
+
+    </section>
+  </main>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/stores.js"></script>
+
+</body>
+</html>
