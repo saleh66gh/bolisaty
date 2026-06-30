@@ -1,10 +1,13 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///bolisaty.db")
 
 WKHTMLTOPDF_PATH = os.getenv(
     "WKHTMLTOPDF_PATH",
-    r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+    "/usr/bin/wkhtmltopdf"
 )
 
 LABELS_DIR = os.getenv("LABELS_DIR", "Labels")
