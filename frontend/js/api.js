@@ -1,4 +1,4 @@
-const API_BASE = "http://api.bolisaty.me";
+const API_BASE = "https://api.bolisaty.me";
 
 function getToken() {
   return localStorage.getItem("bolisaty_token");
