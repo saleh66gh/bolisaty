@@ -129,6 +129,7 @@ def create_label(
         pdf_path, html_path = generate_shipping_label(
             data=data,
             sender=sender,
+            store=store,
             template_html=template.html_code
         )
 
