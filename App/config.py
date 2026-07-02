@@ -7,7 +7,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///bolisaty.db")
 
 WKHTMLTOPDF_PATH = os.getenv(
     "WKHTMLTOPDF_PATH",
-    "/usr/bin/wkhtmltopdf"
+     "/usr/local/bin/wkhtmltopdf"
 )
 
 LABELS_DIR = os.getenv("LABELS_DIR", "Labels")
