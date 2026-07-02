@@ -179,7 +179,6 @@ def generate_shipping_label(
         "enable-local-file-access": "",
         "print-media-type": "",
         "zoom": "1",
-        "disable-smart-shrinking": ""
     }
 
     pdfkit.from_file(
