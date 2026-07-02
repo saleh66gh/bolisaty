@@ -178,7 +178,12 @@ def generate_shipping_label(
         "encoding": "UTF-8",
         "enable-local-file-access": "",
         "print-media-type": "",
-        "zoom": "1.28",
+        "zoom": "1.25",
+        "dpi": "96",
+        "image-dpi": "300",
+        "image-quality": "100",
+        "load-error-handling": "ignore",
+        "load-media-error-handling": "ignore"
     }
 
     pdfkit.from_file(
