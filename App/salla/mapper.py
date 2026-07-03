@@ -37,7 +37,22 @@ def weight_value(value: dict | None):
 
     return value.get("value", 1) or 1
 
+def normalize_order_date(value):
+    if not value:
+        return None
 
+    if isinstance(value, dict):
+        value = value.get("date") or ""
+
+    value = str(value)
+
+    if " " in value:
+        return value.split(" ")[0]
+
+    if "T" in value:
+        return value.split("T")[0]
+
+    return value[:10]
 def map_salla_to_label_data(
     data: SallaShipmentPayloadData,
     sender_id: int,
@@ -47,8 +62,7 @@ def map_salla_to_label_data(
     shipment = data.shipments[0] if data.shipments else None
 
     ship_to = shipment.ship_to if shipment and shipment.ship_to else None
-    order_date_value = data.date
-
+    order_date_value = normalize_order_date(data.date or data.created_at)
     if isinstance(order_date_value, dict):
         order_date_value = order_date_value.get("date") or ""
     customer_name = ""
@@ -110,7 +124,7 @@ def map_salla_to_label_data(
     return LabelData(
         store_name="",
         store_logo=None,
-        order_date=str(order_date_value or data.created_at or ""),
+        order_date=str(order_date_value or ""),
         sender_id=sender_id,
         template_id=template_id,
 
