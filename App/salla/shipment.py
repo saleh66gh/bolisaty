@@ -5,6 +5,7 @@ from App.db_models import LabelTemplate
 from App.label_generator import generate_shipping_label
 from App.salla.models import SallaShipmentPayloadData
 from App.salla.mapper import map_salla_to_label_data
+from App.logger import logger
 
 
 def get_salla_merchant_id(payload: dict) -> str:
@@ -71,11 +72,15 @@ def handle_shipment_creating(db, payload: dict):
 
     tracking_number = label_data.order_number
 
-    return {
+    response = {
         "success": True,
         "data": {
             "tracking_number": tracking_number,
-            "tracking_link": tracking_number,
+            "tracking_link": f"https://api.bolisaty.me/track/{tracking_number}",
             "label_url": f"https://api.bolisaty.me/download-label/{label_data.order_number}",
         }
     }
+
+    logger.warning(response)
+
+    return response
