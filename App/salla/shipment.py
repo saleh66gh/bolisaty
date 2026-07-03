@@ -76,7 +76,7 @@ def handle_shipment_creating(db, payload: dict):
         "success": True,
         "data": {
             "tracking_number": tracking_number,
-            "tracking_link": f"https://api.bolisaty.me/track/{tracking_number}",
+            "tracking_link": tracking_number,
             "label_url": f"https://api.bolisaty.me/download-label/{label_data.order_number}",
         }
     }
