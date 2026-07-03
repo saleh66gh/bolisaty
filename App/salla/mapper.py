@@ -47,7 +47,10 @@ def map_salla_to_label_data(
     shipment = data.shipments[0] if data.shipments else None
 
     ship_to = shipment.ship_to if shipment and shipment.ship_to else None
+    order_date_value = data.date
 
+    if isinstance(order_date_value, dict):
+        order_date_value = order_date_value.get("date") or ""
     customer_name = ""
     customer_phone = ""
 
@@ -107,12 +110,11 @@ def map_salla_to_label_data(
     return LabelData(
         store_name="",
         store_logo=None,
-
+        order_date=str(order_date_value or data.created_at or ""),
         sender_id=sender_id,
         template_id=template_id,
 
         order_number=order_number,
-        order_date=str(data.date or data.created_at or ""),
 
         receiver_country=ship_to.country if ship_to else "السعودية",
         receiver_first_name=first_name,

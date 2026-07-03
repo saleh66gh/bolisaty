@@ -69,7 +69,7 @@ class SallaShipmentPayloadData(BaseModel):
     reference_id: Optional[str | int] = None
     number: Optional[str | int] = None
     created_at: Optional[str] = None
-    date: Optional[str] = None
+    date: Optional[Any] = None
     shipment_reference: Optional[str | int] = None
     policy_options: Optional[dict] = None
 
