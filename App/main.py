@@ -861,10 +861,9 @@ def deactivate_label_template(
 async def salla_shipment_create(request: Request):
     payload = await request.json()
 
-    logger.info(
-        "SALLA shipment.create payload:\n" +
-        json.dumps(payload, ensure_ascii=False, indent=2)
-    )
+    logger.warning("===== SALLA PAYLOAD START =====")
+    logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
+    logger.warning("===== SALLA PAYLOAD END =====")
 
     return {
         "success": True,
