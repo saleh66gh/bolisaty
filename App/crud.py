@@ -500,3 +500,62 @@ def deactivate_label_template(db: Session, template_id: int):
         template_id,
         {"is_active": False}
     )
+def get_store_by_salla_id(db: Session, salla_store_id: str):
+    return db.query(Store).filter(Store.salla_store_id == str(salla_store_id)).first()
+
+
+def create_salla_store(
+    db: Session,
+    salla_store_id: str,
+    store_name: str,
+    owner_name: str,
+):
+    return create_store(
+        db=db,
+        account_number=str(salla_store_id)[-5:],
+        store_name=store_name,
+        owner_name=owner_name,
+        subscription_plan="trial",
+        subscription_status="active",
+        label_limit=100,
+    )
+
+
+def create_default_owner_for_store(db: Session, store: Store):
+    username = f"salla_{store.salla_store_id or store.id}"
+
+    existing = get_user_by_username(db, username)
+    if existing:
+        return existing
+
+    return create_user(
+        db=db,
+        full_name=store.owner_name or store.store_name,
+        username=username,
+        password_hash="SALLA_LOGIN_DISABLED",
+        email=store.email,
+        phone=store.phone,
+        role="store_owner",
+        store_id=store.id,
+    )
+
+def create_default_sender_for_store(db: Session, store: Store, ship_from: dict | None = None):
+    ship_from = ship_from or {}
+
+    existing = get_senders_by_store(db, store.id)
+    if existing:
+        return existing[0]
+
+    return create_sender(
+        db=db,
+        merchant_name=store.owner_name or store.store_name,
+        store_name=ship_from.get("name") or store.store_name,
+        store_phone=ship_from.get("phone") or store.phone or "",
+        merchant_city=ship_from.get("city") or "",
+        merchant_district=ship_from.get("district") or "",
+        merchant_address=ship_from.get("address_line") or "",
+        merchant_national_address=ship_from.get("short_address") or "",
+        store_logo=store.store_logo,
+        sender_branch=ship_from.get("name") or "الفرع الرئيسي",
+        store_id=store.id,
+    )

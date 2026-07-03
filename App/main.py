@@ -12,6 +12,7 @@ from App.models import LabelData
 from App.label_generator import generate_shipping_label
 from App.database import init_db, get_db
 from App import crud
+from App.salla_service import handle_salla_event
 from App.schemas import (
     StoreCreate,
     StoreUpdate,
@@ -877,6 +878,19 @@ async def salla_shipment_create(request: Request):
             "label_url": "https://bolisaty.me"
         }
     }
+@app.post("/salla/app/events")
+async def salla_app_events(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    payload = await request.json()
+
+    logger.warning("===== SALLA APP EVENT START =====")
+    logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
+    logger.warning("===== SALLA APP EVENT END =====")
+
+    result = handle_salla_event(db, payload)
+    return result
 @app.post("/login", response_model=TokenResponse)
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = crud.get_user_by_username(db, data.username)
