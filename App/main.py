@@ -6,7 +6,8 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-
+from fastapi import Request
+import json
 from App.models import LabelData
 from App.label_generator import generate_shipping_label
 from App.database import init_db, get_db
@@ -856,7 +857,23 @@ def deactivate_label_template(
         "template_id": template_id
     }
 
+@app.post("/salla/shipment/create")
+async def salla_shipment_create(request: Request):
+    payload = await request.json()
 
+    logger.info(
+        "SALLA shipment.create payload:\n" +
+        json.dumps(payload, ensure_ascii=False, indent=2)
+    )
+
+    return {
+        "success": True,
+        "data": {
+            "tracking_number": "BLS-TEST",
+            "tracking_link": "https://bolisaty.me",
+            "label_url": "https://bolisaty.me"
+        }
+    }
 @app.post("/login", response_model=TokenResponse)
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = crud.get_user_by_username(db, data.username)
