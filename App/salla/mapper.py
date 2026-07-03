@@ -1,4 +1,4 @@
-from App.models import LabelData, ProductItem
+from App.models import LabelData, Product
 from App.salla.models import SallaShipmentPayloadData
 
 
@@ -83,7 +83,7 @@ def map_salla_to_label_data(
         shipment_count = int(data.policy_options.get("boxes", 1) or 1)
 
     products = [
-        ProductItem(
+        Product(
             name=item.name or "",
             quantity=item.quantity or 1
         )
