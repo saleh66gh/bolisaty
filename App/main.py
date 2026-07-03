@@ -8,6 +8,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from fastapi import Request
 import json
+from App.salla.shipment import handle_shipment_creating
 from App.models import LabelData
 from App.label_generator import generate_shipping_label
 from App.database import init_db, get_db
@@ -859,25 +860,17 @@ def deactivate_label_template(
     }
 
 @app.post("/salla/shipment/create")
-async def salla_shipment_create(request: Request):
+async def salla_shipment_create(
+    request: Request,
+    db: Session = Depends(get_db),
+):
     payload = await request.json()
 
-    print("===== SALLA PAYLOAD START =====")
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
-    print("===== SALLA PAYLOAD END =====")
-
-    logger.warning("===== SALLA PAYLOAD START =====")
+    logger.warning("===== SALLA SHIPMENT CREATING START =====")
     logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
-    logger.warning("===== SALLA PAYLOAD END =====")
+    logger.warning("===== SALLA SHIPMENT CREATING END =====")
 
-    return {
-        "success": True,
-        "data": {
-            "tracking_number": "BLS-TEST",
-            "tracking_link": "https://bolisaty.me",
-            "label_url": "https://bolisaty.me"
-        }
-    }
+    return handle_shipment_creating(db, payload)
 @app.post("/salla/app/events")
 async def salla_app_events(
     request: Request,
