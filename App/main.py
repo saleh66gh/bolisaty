@@ -1,13 +1,12 @@
 import os
 import json
-
+from fastapi.responses import FileResponse
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from fastapi import Request
-import json
 from App.salla.shipment import handle_shipment_creating
 from App.models import LabelData
 from App.label_generator import generate_shipping_label
@@ -884,6 +883,18 @@ async def salla_app_events(
 
     result = handle_salla_event(db, payload)
     return result
+@app.get("/download-label/{order_number}")
+def download_label(order_number: str):
+    pdf_path = f"Labels/label_{order_number}.pdf"
+
+    if not os.path.exists(pdf_path):
+        raise HTTPException(status_code=404, detail="Label not found")
+
+    return FileResponse(
+        path=pdf_path,
+        media_type="application/pdf",
+        filename=f"label_{order_number}.pdf"
+    )
 @app.post("/login", response_model=TokenResponse)
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = crud.get_user_by_username(db, data.username)
