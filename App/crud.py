@@ -335,7 +335,8 @@ def create_store(
     label_limit: int = 100,
     store_logo: Optional[str] = None,
     subscription_start = None,
-    subscription_end = None
+    subscription_end = None,
+    salla_store_id: Optional[str] = None,
 ):
     store = Store(
         account_number=account_number,
@@ -352,6 +353,7 @@ def create_store(
         subscription_start = subscription_start,
         subscription_end = subscription_end,
         api_key=generate_store_api_key(),
+        salla_store_id=salla_store_id,
 
     )
 
@@ -512,7 +514,8 @@ def create_salla_store(
 ):
     return create_store(
         db=db,
-        account_number=str(salla_store_id)[-5:],
+        account_number=f"S{salla_store_id}",
+        salla_store_id=str(salla_store_id),
         store_name=store_name,
         owner_name=owner_name,
         subscription_plan="trial",
