@@ -81,6 +81,7 @@ def handle_shipment_creating(db, payload: dict):
         }
     }
 
-    logger.warning(response)
+    print("===== SALLA RESPONSE =====")
+    print(response)
 
     return response
