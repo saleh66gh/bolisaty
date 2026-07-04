@@ -1,5 +1,5 @@
+from datetime import date
 from App.models import LabelData, Product
-from App.salla.models import SallaShipmentPayloadData
 
 
 def split_customer_name(full_name: str):
@@ -21,25 +21,35 @@ def get_district_name(district):
     if isinstance(district, str):
         return district
 
-    return district.name or ""
+    if isinstance(district, dict):
+        return district.get("name") or ""
+
+    return ""
 
 
-def money_amount(value: dict | None):
+def money_amount(value):
     if not value:
         return 0
 
-    return value.get("amount", 0) or 0
+    if isinstance(value, dict):
+        return value.get("amount", 0) or 0
+
+    return value or 0
 
 
-def weight_value(value: dict | None):
+def weight_value(value):
     if not value:
         return 1
 
-    return value.get("value", 1) or 1
+    if isinstance(value, dict):
+        return value.get("value", 1) or 1
+
+    return value or 1
+
 
 def normalize_order_date(value):
     if not value:
-        return None
+        return date.today().isoformat()
 
     if isinstance(value, dict):
         value = value.get("date") or ""
@@ -52,85 +62,91 @@ def normalize_order_date(value):
     if "T" in value:
         return value.split("T")[0]
 
-    return value[:10]
+    return value[:10] or date.today().isoformat()
+
+
+def build_receiver_address(city, district, national_address, address_line):
+    if address_line:
+        return address_line
+
+    return " - ".join(
+        part for part in [
+            city,
+            district,
+            national_address
+        ]
+        if part
+    )
+
+
 def map_salla_to_label_data(
-    data: SallaShipmentPayloadData,
+    payload: dict,
     sender_id: int,
     template_id: int,
 ) -> LabelData:
+    data = payload.get("data", payload)
 
-    shipment = data.shipments[0] if data.shipments else None
+    ship_to = data.get("ship_to") or {}
+    packages = data.get("packages") or []
 
-    ship_to = shipment.ship_to if shipment and shipment.ship_to else None
-    order_date_value = normalize_order_date(data.date or data.created_at)
-    if isinstance(order_date_value, dict):
-        order_date_value = order_date_value.get("date") or ""
-    customer_name = ""
-    customer_phone = ""
-
-    if ship_to:
-        customer_name = ship_to.name or ""
-        customer_phone = ship_to.phone or ""
-
-    if data.customer:
-        customer_name = customer_name or data.customer.name or ""
-        customer_phone = customer_phone or data.customer.mobile or ""
+    customer_name = ship_to.get("name") or ""
+    customer_phone = ship_to.get("phone") or ""
 
     first_name, last_name = split_customer_name(customer_name)
 
     order_number = str(
-        data.shipment_reference
-        or data.reference_id
-        or data.number
-        or data.id
-        or (shipment.id if shipment else "")
+        data.get("order_reference_id")
+        or data.get("order_id")
+        or data.get("id")
         or ""
     )
 
-    cod_amount = money_amount(
-        shipment.cash_on_delivery if shipment else None
+    order_date = normalize_order_date(
+        data.get("created_at")
+        or payload.get("created_at")
     )
 
-    total_weight = weight_value(
-        shipment.total_weight if shipment else None
+    receiver_city = ship_to.get("city") or ""
+    receiver_district = (
+        get_district_name(ship_to.get("district"))
+        or ship_to.get("block")
+        or ""
+    )
+    receiver_national_address = ship_to.get("short_address") or None
+    receiver_address = build_receiver_address(
+        city=receiver_city,
+        district=receiver_district,
+        national_address=receiver_national_address,
+        address_line=ship_to.get("address_line") or "",
     )
 
-    shipment_count = 1
-    if data.policy_options:
-        shipment_count = int(data.policy_options.get("boxes", 1) or 1)
+    cod_amount = money_amount(data.get("cash_on_delivery"))
+    total_weight = weight_value(data.get("total_weight"))
+
+    shipment_count = int(
+        ((data.get("meta") or {}).get("policy_options") or {}).get("boxes", 1)
+        or 1
+    )
 
     products = [
         Product(
-            name=item.name or "",
-            quantity=item.quantity or 1
+            name=item.get("name") or "",
+            quantity=item.get("quantity") or 1
         )
-        for item in data.items
+        for item in packages
     ]
-    receiver_city = ship_to.city if ship_to else ""
-    receiver_district = get_district_name(ship_to.district) if ship_to else ""
-    receiver_national_address = ship_to.short_address if ship_to else None
-    receiver_address = ship_to.address_line if ship_to else ""
-
-    if not receiver_address:
-        receiver_address = " - ".join(
-            part for part in [
-                receiver_city,
-                receiver_district,
-                receiver_national_address
-            ]
-            if part
-        )
 
     return LabelData(
         store_name="",
         store_logo=None,
-        order_date=str(order_date_value or ""),
+
         sender_id=sender_id,
         template_id=template_id,
 
         order_number=order_number,
+        order_date=order_date,
 
-        receiver_country=ship_to.country if ship_to else "السعودية",
+        receiver_country=ship_to.get("country") or "السعودية",
         receiver_first_name=first_name,
         receiver_last_name=last_name,
         receiver_phone=customer_phone,

@@ -58,7 +58,7 @@ def handle_shipment_creating(db, payload: dict):
         raise HTTPException(status_code=404, detail="Template not found")
 
     label_data = map_salla_to_label_data(
-        data=data,
+        payload=payload,
         sender_id=sender.id,
         template_id=template.id,
     )
