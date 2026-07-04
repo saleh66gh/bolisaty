@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-
+import json
 from App import crud
 from App.db_models import LabelTemplate
 from App.label_generator import generate_shipping_label
@@ -63,12 +63,41 @@ def handle_shipment_creating(db, payload: dict):
         template_id=template.id,
     )
 
-    generate_shipping_label(
+
+    pdf_path, html_path = generate_shipping_label(
         data=label_data,
         sender=sender,
         store=store,
         template_html=template.html_code,
     )
+    customer_name = f"{label_data.receiver_first_name} {label_data.receiver_last_name}".strip()
+
+    label = crud.create_label(
+        db=db,
+        order_number=label_data.order_number,
+        customer_name=customer_name,
+        customer_phone=label_data.receiver_phone,
+        customer_city=label_data.receiver_city,
+        customer_district=label_data.receiver_district,
+        customer_address=label_data.receiver_address,
+        customer_short_address=label_data.receiver_national_address,
+        sender_id=sender.id,
+        user_id=None,
+        store_id=store.id,
+        products_json=json.dumps(
+            [product.model_dump() for product in label_data.products],
+            ensure_ascii=False
+        ),
+        payment_method="cash" if label_data.cod_enabled else "paid",
+        cod_amount=label_data.cod_amount or 0,
+        shipment_count=str(label_data.shipment_count),
+        weight=str(label_data.weight),
+        pdf_path=pdf_path,
+        html_path=html_path,
+        status="created"
+    )
+
+    crud.increment_store_labels_used(db, store.id)
 
     tracking_number = label_data.order_number
 
