@@ -869,7 +869,19 @@ async def salla_shipment_create(
     logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
     logger.warning("===== FUNCTION PAYLOAD END =====")
 
-    return 0
+    return handle_shipment_creating(db, payload)
+@app.post("/salla/debug")
+async def salla_debug(request: Request):
+    payload = await request.json()
+
+    print("===== SALLA DEBUG PAYLOAD START =====")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print("===== SALLA DEBUG PAYLOAD END =====")
+
+    return {
+        "success": True,
+        "received": True
+    }
 @app.post("/salla/app/events")
 async def salla_app_events(
     request: Request,
