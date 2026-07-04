@@ -101,23 +101,10 @@ def handle_shipment_creating(db, payload: dict):
 
     tracking_number = label_data.order_number
 
-    response = {
-        "success": True,
-        "data": {
-            "shipping_number": tracking_number,
-            "tracking_number": tracking_number,
-            "trackable": True,
-            "tracking_link": f"https://api.bolisaty.me/track/{tracking_number}",
-            "label": [
-                {
-                    "format": "pdf",
-                    "url": f"https://api.bolisaty.me/download-label/{label_data.order_number}"
-                }
-            ]
-        }
-    }
-
-    print("===== SALLA RESPONSE =====")
-    print(response)
-
-    return response
+    return {
+  "success": True,
+  "shipment_number": "267472546",
+  "tracking_number": "267472546",
+  "tracking_link": "https://api.bolisaty.me/track/267472546",
+  "pdf_label": "https://api.bolisaty.me/download-label/267472546"
+}
