@@ -869,7 +869,7 @@ async def salla_shipment_create(
     logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
     logger.warning("===== FUNCTION PAYLOAD END =====")
 
-    return handle_shipment_creating(db, payload)
+    return 0
 @app.post("/salla/app/events")
 async def salla_app_events(
     request: Request,
