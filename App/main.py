@@ -865,9 +865,9 @@ async def salla_shipment_create(
 ):
     payload = await request.json()
 
-    logger.warning("===== SALLA SHIPMENT CREATING START =====")
+    logger.warning("===== FUNCTION PAYLOAD START =====")
     logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
-    logger.warning("===== SALLA SHIPMENT CREATING END =====")
+    logger.warning("===== FUNCTION PAYLOAD END =====")
 
     return handle_shipment_creating(db, payload)
 @app.post("/salla/app/events")
