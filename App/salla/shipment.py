@@ -73,23 +73,11 @@ def handle_shipment_creating(db, payload: dict):
             sender_id=sender.id,
             template_id=template.id,
         )
-        print("SHIPMENT COUNT =", label_data.shipment_count)
         existing_label = crud.get_label_by_order_and_store(
             db=db,
             order_number=label_data.order_number,
             store_id=store.id,
         )
-
-        if existing_label:
-            tracking_number = str(existing_label.order_number)
-
-            return {
-                "success": True,
-                "shipment_number": tracking_number,
-                "tracking_number": tracking_number,
-                "tracking_link": f"https://api.bolisaty.me/track/{tracking_number}",
-                "pdf_label": f"https://api.bolisaty.me/download-label/{tracking_number}"
-            }
 
         pdf_path, html_path = generate_shipping_label(
             data=label_data,
