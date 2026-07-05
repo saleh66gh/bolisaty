@@ -73,11 +73,6 @@ def handle_shipment_creating(db, payload: dict):
             sender_id=sender.id,
             template_id=template.id,
         )
-        existing_label = crud.get_label_by_order_and_store(
-            db=db,
-            order_number=label_data.order_number,
-            store_id=store.id,
-        )
 
         pdf_path, html_path = generate_shipping_label(
             data=label_data,
