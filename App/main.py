@@ -12,7 +12,7 @@ from App.models import LabelData
 from App.label_generator import generate_shipping_label
 from App.database import init_db, get_db
 from App import crud
-from App.salla.salla_service import handle_salla_event
+from App.salla.service import handle_salla_event
 from App.schemas import (
     StoreCreate,
     StoreUpdate,
