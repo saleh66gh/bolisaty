@@ -73,6 +73,7 @@ def handle_shipment_creating(db, payload: dict):
             sender_id=sender.id,
             template_id=template.id,
         )
+        print("SHIPMENT COUNT =", label_data.shipment_count)
         existing_label = crud.get_label_by_order_and_store(
             db=db,
             order_number=label_data.order_number,

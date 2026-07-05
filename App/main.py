@@ -52,7 +52,17 @@ app.add_middleware(
 )
 
 init_db()
+def save_salla_raw_log(source: str, payload: dict):
+    os.makedirs("Logs/salla", exist_ok=True)
 
+    path = "Logs/salla/salla_requests.jsonl"
+
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps({
+            "source": source,
+            "created_at": datetime.utcnow().isoformat(),
+            "payload": payload
+        }, ensure_ascii=False) + "\n")
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -864,7 +874,7 @@ async def salla_shipment_create(
     db: Session = Depends(get_db),
 ):
     payload = await request.json()
-
+    save_salla_raw_log("shipment_create", payload)
     return handle_shipment_creating(db, payload)
 
 @app.post("/salla/app/events")
@@ -874,9 +884,7 @@ async def salla_app_events(
 ):
     payload = await request.json()
 
-    logger.warning("===== SALLA APP EVENT START =====")
-    logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
-    logger.warning("===== SALLA APP EVENT END =====")
+    save_salla_raw_log("app_event", payload)
 
     result = handle_salla_event(db, payload)
     return result
