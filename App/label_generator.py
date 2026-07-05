@@ -80,15 +80,6 @@ def generate_shipping_label(
     store=None,
     template_html: str | None = None,
 ):
-    """
-    يولد ملف HTML و PDF من قالب HTML محفوظ في قاعدة البيانات.
-
-    مهم:
-    - لا يوجد قالب ثابت داخل هذا الملف.
-    - يجب تمرير template_html من قاعدة البيانات.
-    - store اختياري لكن يستخدم للشعار واسم المتجر إذا توفر.
-    """
-
     if not template_html:
         raise ValueError("Label template HTML is required")
 
@@ -125,48 +116,60 @@ def generate_shipping_label(
     if store_logo:
         store_logo_html = f'<img src="{_file_uri(store_logo)}" class="store-logo">'
 
-    variables = {
-        "store_logo": store_logo_html,
-        "store_name": _safe(store_name),
+    total_pages = int(data.shipment_count or 1)
+    if total_pages < 1:
+        total_pages = 1
 
-        "order_number": _safe(data.order_number),
-        "order_date": _safe(data.order_date),
+    pages_html = []
 
-        "receiver_name": _safe(receiver_name),
-        "receiver_phone": _safe(data.receiver_phone),
-        "receiver_city": _safe(data.receiver_city),
-        "receiver_district": _safe(data.receiver_district),
-        "receiver_address": _safe(data.receiver_address),
-        "receiver_national_address": _safe(data.receiver_national_address),
+    for page_number in range(1, total_pages + 1):
+        variables = {
+            "store_logo": store_logo_html,
+            "store_name": _safe(store_name),
 
-        "sender_store_name": _safe(getattr(sender, "store_name", "")),
-        "sender_phone": _safe(getattr(sender, "store_phone", "")),
-        "sender_address": _safe(getattr(sender, "merchant_address", "")),
-        "sender_branch": _safe(getattr(sender, "sender_branch", "")),
+            "order_number": _safe(data.order_number),
+            "order_date": _safe(data.order_date),
 
-        "shipment_count": _safe(data.shipment_count),
-        "weight": _safe(data.weight),
-        "cod_enabled": "نعم" if data.cod_enabled else "لا",
-        "cod_amount": _safe(f"{data.cod_amount} ريال" if data.cod_enabled else "0 ريال"),
+            "receiver_name": _safe(receiver_name),
+            "receiver_phone": _safe(data.receiver_phone),
+            "receiver_city": _safe(data.receiver_city),
+            "receiver_district": _safe(data.receiver_district),
+            "receiver_address": _safe(data.receiver_address),
+            "receiver_national_address": _safe(data.receiver_national_address),
 
-        "products": _build_products_html(data.products),
-        "notes": _safe(data.notes),
+            "sender_store_name": _safe(getattr(sender, "store_name", "")),
+            "sender_phone": _safe(getattr(sender, "store_phone", "")),
+            "sender_address": _safe(getattr(sender, "merchant_address", "")),
+            "sender_branch": _safe(getattr(sender, "sender_branch", "")),
 
-        "qr_phone": phone_qr_uri,
-        "qr_location": location_qr_uri,
+            "shipment_count": _safe(f"{page_number}/{total_pages}"),
+            "weight": _safe(data.weight),
+            "cod_enabled": "نعم" if data.cod_enabled else "لا",
+            "cod_amount": _safe(f"{data.cod_amount} ريال" if data.cod_enabled else "0 ريال"),
 
-        "font_cairo_regular": cairo_regular,
-        "font_cairo_bold": cairo_bold,
-    }
+            "products": _build_products_html(data.products),
+            "notes": _safe(data.notes),
 
-    html = _replace_template_variables(template_html, variables)
+            "qr_phone": phone_qr_uri,
+            "qr_location": location_qr_uri,
+
+            "font_cairo_regular": cairo_regular,
+            "font_cairo_bold": cairo_bold,
+        }
+
+        page_html = _replace_template_variables(template_html, variables)
+
+        if page_number < total_pages:
+            page_html += '<div style="page-break-after: always;"></div>'
+
+        pages_html.append(page_html)
+
+    html = "\n".join(pages_html)
 
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html)
 
-    config = pdfkit.configuration(
-        wkhtmltopdf=WKHTMLTOPDF_PATH
-    )
+    config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
 
     options = {
         "page-width": "100mm",
@@ -183,7 +186,7 @@ def generate_shipping_label(
         "image-dpi": "300",
         "image-quality": "100",
         "load-error-handling": "ignore",
-        "load-media-error-handling": "ignore"
+        "load-media-error-handling": "ignore",
     }
 
     pdfkit.from_file(

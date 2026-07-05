@@ -597,3 +597,79 @@ def create_default_sender_for_store(db: Session, store: Store, ship_from: dict |
         sender_branch=ship_from.get("name") or "الفرع الرئيسي",
         store_id=store.id,
     )
+def update_store_from_salla(db: Session, store: Store, data: dict):
+    store_data = data.get("data", data) or {}
+
+    store.store_name = (
+        store_data.get("name")
+        or store_data.get("store_name")
+        or store.store_name
+    )
+
+    store.owner_name = (
+        store_data.get("owner")
+        or store_data.get("owner_name")
+        or store.owner_name
+    )
+
+    store.email = store_data.get("email") or store.email
+    store.phone = store_data.get("phone") or store.phone
+
+    store.store_logo = (
+        store_data.get("logo")
+        or store_data.get("avatar")
+        or store_data.get("store_logo")
+        or store.store_logo
+    )
+
+    store.store_domain = (
+        store_data.get("domain")
+        or store_data.get("store_domain")
+        or store_data.get("url")
+        or store.store_domain
+    )
+
+    store.store_platform = "salla"
+    store.external_store_id = store.salla_store_id
+    store.last_platform_sync = datetime.utcnow()
+    store.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(store)
+    return store
+def update_store_subscription(
+    db,
+    store,
+    *,
+    plan=None,
+    status=None,
+    start=None,
+    end=None,
+):
+    if plan is not None:
+        store.subscription_plan = plan
+
+    if status is not None:
+        store.subscription_status = status
+
+    if start is not None:
+        store.subscription_start = start
+
+    if end is not None:
+        store.subscription_end = end
+
+    store.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(store)
+
+    return store
+def get_label_by_order_and_store(db, order_number: str, store_id: int):
+    return (
+        db.query(Label)
+        .filter(
+            Label.order_number == str(order_number),
+            Label.store_id == store_id
+        )
+        .first()
+    )

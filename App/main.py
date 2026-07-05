@@ -12,7 +12,7 @@ from App.models import LabelData
 from App.label_generator import generate_shipping_label
 from App.database import init_db, get_db
 from App import crud
-from App.salla_service import handle_salla_event
+from App.salla.salla_service import handle_salla_event
 from App.schemas import (
     StoreCreate,
     StoreUpdate,
@@ -865,23 +865,8 @@ async def salla_shipment_create(
 ):
     payload = await request.json()
 
-    logger.warning("===== FUNCTION PAYLOAD START =====")
-    logger.warning(json.dumps(payload, ensure_ascii=False, indent=2))
-    logger.warning("===== FUNCTION PAYLOAD END =====")
-
     return handle_shipment_creating(db, payload)
-@app.post("/salla/debug")
-async def salla_debug(request: Request):
-    payload = await request.json()
 
-    print("===== SALLA DEBUG PAYLOAD START =====")
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
-    print("===== SALLA DEBUG PAYLOAD END =====")
-
-    return {
-        "success": True,
-        "received": True
-    }
 @app.post("/salla/app/events")
 async def salla_app_events(
     request: Request,
@@ -896,14 +881,20 @@ async def salla_app_events(
     result = handle_salla_event(db, payload)
     return result
 @app.get("/download-label/{order_number}")
-def download_label(order_number: str):
-    pdf_path = f"Labels/label_{order_number}.pdf"
+def download_label(
+    order_number: str,
+    db: Session = Depends(get_db),
+):
+    label = crud.get_label_by_order_number(db, order_number)
 
-    if not os.path.exists(pdf_path):
+    if not label:
         raise HTTPException(status_code=404, detail="Label not found")
 
+    if not label.pdf_path or not os.path.exists(label.pdf_path):
+        raise HTTPException(status_code=404, detail="PDF file not found")
+
     return FileResponse(
-        path=pdf_path,
+        path=label.pdf_path,
         media_type="application/pdf",
         filename=f"label_{order_number}.pdf"
     )
