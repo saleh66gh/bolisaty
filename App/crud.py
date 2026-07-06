@@ -120,7 +120,7 @@ def create_sender(
         store_id=store_id,
         is_active=True
     )
-
+    print("CREATE BRANCH ID =", sender_branch)
     db.add(sender)
     db.commit()
     db.refresh(sender)
