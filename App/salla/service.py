@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from App import crud
+from App.salla.client import get_store_info
 from App.salla.sync import sync_store_info
 def parse_date(value):
     if not value:
@@ -79,7 +80,13 @@ def handle_store_connected(db, payload: dict, merchant_id: str):
 
     store.salla_access_token = data.get("access_token") or store.salla_access_token
     store.salla_refresh_token = data.get("refresh_token") or store.salla_refresh_token
+    try:
+        info = get_store_info(store, db)
+        print("STORE INFO =", info)
+    except Exception as ex:
+        print("GET STORE INFO ERROR:", ex)
 
+    print(info)
     crud.update_store_subscription(
         db=db,
         store=store,
