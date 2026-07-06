@@ -167,17 +167,13 @@ def deactivate_sender(db: Session, sender_id: int):
     return update_sender(db, sender_id, {"is_active": False})
 
 def get_sender_by_salla_ship_from(db: Session, store_id: int, ship_from: dict):
-    city = ship_from.get("city") or ""
-    district = ship_from.get("district") or ""
-    address = ship_from.get("address_line") or ""
+    branch_id = str(ship_from.get("branch_id") or "")
 
     return (
         db.query(Sender)
         .filter(
             Sender.store_id == store_id,
-            Sender.merchant_city == city,
-            Sender.merchant_district == district,
-            Sender.merchant_address == address,
+            Sender.sender_branch == branch_id,
         )
         .first()
     )
@@ -187,6 +183,18 @@ def get_or_create_sender_from_salla(db: Session, store: Store, ship_from: dict):
     sender = get_sender_by_salla_ship_from(db, store.id, ship_from)
 
     if sender:
+        sender.store_phone = ship_from.get("phone") or sender.store_phone
+        sender.merchant_city = ship_from.get("city") or sender.merchant_city
+        sender.merchant_district = ship_from.get("district") or sender.merchant_district
+        sender.merchant_address = ship_from.get("address_line") or sender.merchant_address
+        sender.merchant_national_address = (
+                ship_from.get("short_address") or sender.merchant_national_address
+        )
+        sender.store_logo = store.store_logo
+
+        db.commit()
+        db.refresh(sender)
+
         return sender
 
     return create_sender(
@@ -199,7 +207,7 @@ def get_or_create_sender_from_salla(db: Session, store: Store, ship_from: dict):
         merchant_address=ship_from.get("address_line") or "",
         merchant_national_address=ship_from.get("short_address") or "",
         store_logo=store.store_logo,
-        sender_branch=ship_from.get("name") or "فرع سلة",
+        sender_branch=str(ship_from.get("branch_id") or ""),
         store_id=store.id,
     )
 def delete_sender(db: Session, sender_id: int):
