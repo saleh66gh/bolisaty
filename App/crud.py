@@ -168,7 +168,7 @@ def deactivate_sender(db: Session, sender_id: int):
 
 def get_sender_by_salla_ship_from(db: Session, store_id: int, ship_from: dict):
     branch_id = str(ship_from.get("branch_id") or "")
-
+    print("CREATE BRANCH ID =", branch_id)
     return (
         db.query(Sender)
         .filter(
