@@ -38,6 +38,7 @@ def get_default_template(db, store):
 
 
 def handle_shipment_creating(db, payload: dict):
+    print("######## HANDLE SHIPMENT CREATING ########")
     try:
         merchant_id = get_salla_merchant_id(payload)
 
