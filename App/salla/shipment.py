@@ -54,7 +54,7 @@ def handle_shipment_creating(db, payload: dict):
             return error_response(reason)
 
         data = payload.get("data", {}) or {}
-
+        print(json.dumps(data, ensure_ascii=False, indent=2))
         ship_from = data.get("ship_from") or {}
 
         sender = crud.get_or_create_sender_from_salla(
