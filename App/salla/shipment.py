@@ -60,7 +60,7 @@ def handle_shipment_creating(db, payload: dict):
         data = payload.get("data", {}) or {}
         print(json.dumps(data, ensure_ascii=False, indent=2))
         ship_from = data.get("ship_from") or {}
-
+        print("HAS SHIPMENT_BRANCH =", "shipment_branch" in data)
         sender = crud.get_or_create_sender_from_salla(
             db=db,
             store=store,
