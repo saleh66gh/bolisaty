@@ -43,15 +43,18 @@ def handle_shipment_creating(db, payload: dict):
         merchant_id = get_salla_merchant_id(payload)
 
         if not merchant_id:
+            print("Merchant ID not found")
             return error_response("لم يصل رقم متجر سلة")
 
         store = crud.get_store_by_salla_id(db, merchant_id)
 
         if not store:
+            print("Store not found")
             return error_response("المتجر غير مربوط في بوليصتي")
 
         allowed, reason = crud.can_store_create_label(store)
         if not allowed:
+            print("not allowed")
             return error_response(reason)
 
         data = payload.get("data", {}) or {}
