@@ -81,12 +81,14 @@ def build_receiver_address(city, district, national_address, address_line):
 
 def map_salla_to_label_data(
     payload: dict,
-    sender_id: int,
     template_id: int,
+    store_name: str,
 ) -> LabelData:
+
     data = payload.get("data", payload)
 
     ship_to = data.get("ship_to") or {}
+    ship_from = data.get("ship_from") or {}
     packages = data.get("packages") or []
 
     customer_name = ship_to.get("name") or ""
@@ -107,12 +109,15 @@ def map_salla_to_label_data(
     )
 
     receiver_city = ship_to.get("city") or ""
+
     receiver_district = (
         get_district_name(ship_to.get("district"))
         or ship_to.get("block")
         or ""
     )
+
     receiver_national_address = ship_to.get("short_address") or None
+
     receiver_address = build_receiver_address(
         city=receiver_city,
         district=receiver_district,
@@ -124,23 +129,43 @@ def map_salla_to_label_data(
     total_weight = weight_value(data.get("total_weight"))
 
     shipment_count = int(
-        ((data.get("meta") or {}).get("policy_options") or {}).get("boxes", 1)
+        (
+            (data.get("meta") or {})
+            .get("policy_options") or {}
+        ).get("boxes", 1)
         or 1
     )
 
     products = [
         Product(
             name=item.get("name") or "",
-            quantity=item.get("quantity") or 1
+            quantity=item.get("quantity") or 1,
         )
         for item in packages
     ]
 
     return LabelData(
+
+        # بيانات المتجر
         store_name="",
         store_logo=None,
 
-        sender_id=sender_id,
+        # بيانات المرسل (مباشرة من سلة)
+        sender_store_name=store_name,
+        sender_phone=ship_from.get("phone") or "",
+        sender_city=ship_from.get("city") or "",
+
+        sender_district=(
+            get_district_name(ship_from.get("district"))
+            or ship_from.get("block")
+            or ""
+        ),
+
+        sender_address=ship_from.get("address_line") or "",
+        sender_national_address=ship_from.get("short_address") or "",
+        sender_branch=ship_from.get("name") or "",
+        sender_logo=None,
+
         template_id=template_id,
 
         order_number=order_number,
@@ -163,5 +188,5 @@ def map_salla_to_label_data(
         cod_amount=float(cod_amount),
 
         products=products,
-        notes=""
+        notes="",
     )

@@ -76,7 +76,7 @@ def _replace_template_variables(template_html: str, variables: dict):
 
 def generate_shipping_label(
     data: LabelData,
-    sender,
+    sender=None,
     store=None,
     template_html: str | None = None,
 ):
@@ -108,9 +108,17 @@ def generate_shipping_label(
     location_qr_uri = Path(location_qr_path).resolve().as_uri()
 
     receiver_name = f"{data.receiver_first_name} {data.receiver_last_name}".strip()
+    store_name = (
+            getattr(store, "store_name", None)
+            or getattr(sender, "store_name", None)
+            or getattr(data, "store_name", "")
+    )
 
-    store_name = getattr(store, "store_name", None) or getattr(sender, "store_name", "")
-    store_logo = getattr(store, "store_logo", None)
+    store_logo = (
+            getattr(store, "store_logo", None)
+            or getattr(sender, "store_logo", None)
+            or getattr(data, "store_logo", None)
+    )
 
     store_logo_html = ""
     if store_logo:
@@ -137,10 +145,25 @@ def generate_shipping_label(
             "receiver_address": _safe(data.receiver_address),
             "receiver_national_address": _safe(data.receiver_national_address),
 
-            "sender_store_name": _safe(getattr(sender, "store_name", "")),
-            "sender_phone": _safe(getattr(sender, "store_phone", "")),
-            "sender_address": _safe(getattr(sender, "merchant_address", "")),
-            "sender_branch": _safe(getattr(sender, "sender_branch", "")),
+            "sender_store_name": _safe(
+                getattr(sender, "store_name", None)
+                or getattr(data, "sender_store_name", "")
+            ),
+
+            "sender_phone": _safe(
+                getattr(sender, "store_phone", None)
+                or getattr(data, "sender_phone", "")
+            ),
+
+            "sender_address": _safe(
+                getattr(sender, "merchant_address", None)
+                or getattr(data, "sender_address", "")
+            ),
+
+            "sender_branch": _safe(
+                getattr(sender, "sender_branch", None)
+                or getattr(data, "sender_branch", "")
+            ),
 
             "shipment_count": _safe(f"{page_number}/{total_pages}"),
             "weight": _safe(data.weight),

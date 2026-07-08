@@ -26,9 +26,23 @@ class Product(BaseModel):
 class LabelData(BaseModel):
     store_name: str
     store_logo: Optional[str] = None
+
     order_number: str
     order_date: date
-    sender_id: int
+
+    sender_id: Optional[int] = None
+
+    sender_store_name: str
+    sender_phone: str
+
+    sender_city: str
+    sender_district: str
+    sender_address: str
+    sender_national_address: Optional[str] = None
+
+    sender_branch: str
+    sender_logo: Optional[str] = None
+
     receiver_country: str
     receiver_first_name: str
     receiver_last_name: Optional[str] = None
@@ -45,6 +59,7 @@ class LabelData(BaseModel):
 
     products: List[Product]
     notes: Optional[str] = ""
+
     template_id: int
 
     @field_validator("order_number")
