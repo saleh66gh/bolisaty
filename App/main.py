@@ -883,7 +883,7 @@ async def salla_app_events(
     db: Session = Depends(get_db),
 ):
     payload = await request.json()
-
+    print(payload)
     save_salla_raw_log("app_event", payload)
 
     result = handle_salla_event(db, payload)
